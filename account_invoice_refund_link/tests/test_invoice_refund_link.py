@@ -25,15 +25,21 @@ class TestInvoiceRefundLinkBase(AccountTestInvoicingCommon):
                 tracking_disable=True,
             )
         )
+        cls.company = cls.env.company
+        cls.receivable_account = cls.company_data["default_account_receivable"]
+        cls.payable_account = cls.company_data["default_account_payable"]
+        cls.company.partner_id.with_company(cls.company).write(
+            {
+                "property_account_receivable_id": cls.receivable_account.id,
+                "property_account_payable_id": cls.payable_account.id,
+            }
+        )
         cls.partner = cls.env["res.partner"].create(
             {
                 "name": "Test partner",
-                "property_account_receivable_id": cls.company_data[
-                    "default_account_receivable"
-                ].id,
-                "property_account_payable_id": cls.company_data[
-                    "default_account_payable"
-                ].id,
+                "company_id": cls.company.id,
+                "property_account_receivable_id": cls.receivable_account.id,
+                "property_account_payable_id": cls.payable_account.id,
             }
         )
         default_line_account = cls.env["account.account"].create(
@@ -41,7 +47,7 @@ class TestInvoiceRefundLinkBase(AccountTestInvoicingCommon):
                 "name": "TESTACC",
                 "code": "TESTACC",
                 "account_type": "income",
-                "company_ids": [Command.link(cls.env.user.company_id.id)],
+                "company_ids": [Command.link(cls.company.id)],
             }
         )
         cls.journal = cls.env["account.journal"].create(
@@ -49,7 +55,7 @@ class TestInvoiceRefundLinkBase(AccountTestInvoicingCommon):
                 "name": "Journal 1",
                 "code": "J1",
                 "type": "sale",
-                "company_id": cls.env.user.company_id.id,
+                "company_id": cls.company.id,
             }
         )
         cls.invoice_lines = [
@@ -85,6 +91,8 @@ class TestInvoiceRefundLinkBase(AccountTestInvoicingCommon):
         cls.invoice = cls.env["account.move"].create(
             {
                 "partner_id": cls.partner.id,
+                "company_id": cls.company.id,
+                "journal_id": cls.journal.id,
                 "move_type": "out_invoice",
                 "invoice_line_ids": cls.invoice_lines,
             }
