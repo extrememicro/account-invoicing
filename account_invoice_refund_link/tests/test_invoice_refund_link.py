@@ -3,6 +3,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
+from odoo.tests import tagged
+
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 from .. import post_init_hook
@@ -35,14 +37,7 @@ class TestInvoiceRefundLinkBase(AccountTestInvoicingCommon):
         )
         cls.partner = cls.partner_a
         default_line_account = cls.company_data["default_account_revenue"]
-        cls.journal = cls.env["account.journal"].create(
-            {
-                "name": "Journal 1",
-                "code": "J1",
-                "type": "sale",
-                "company_id": cls.company.id,
-            }
-        )
+        cls.journal = cls.company_data["default_journal_sale"]
         cls.invoice_lines = [
             (
                 0,
@@ -112,6 +107,7 @@ class TestInvoiceRefundLinkBase(AccountTestInvoicingCommon):
         )
 
 
+@tagged("post_install", "-at_install")
 class TestInvoiceRefundLink(TestInvoiceRefundLinkBase):
     @classmethod
     def setUpClass(cls):
@@ -144,6 +140,7 @@ class TestInvoiceRefundLink(TestInvoiceRefundLinkBase):
         )
 
 
+@tagged("post_install", "-at_install")
 class TestInvoiceRefundNoModifyLink(TestInvoiceRefundLinkBase):
     is_modify = False
 
@@ -151,6 +148,7 @@ class TestInvoiceRefundNoModifyLink(TestInvoiceRefundLinkBase):
         self._test_refund_link()
 
 
+@tagged("post_install", "-at_install")
 class TestInvoiceRefundModifyLink(TestInvoiceRefundLinkBase):
     is_modify = True
 
