@@ -4,12 +4,12 @@
 
 from odoo import Command
 
-from odoo.addons.base.tests.common import BaseCommon
+from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 from .. import post_init_hook
 
 
-class TestInvoiceRefundLinkBase(BaseCommon):
+class TestInvoiceRefundLinkBase(AccountTestInvoicingCommon):
     is_modify = False
 
     @classmethod
@@ -25,7 +25,17 @@ class TestInvoiceRefundLinkBase(BaseCommon):
                 tracking_disable=True,
             )
         )
-        cls.partner = cls.env["res.partner"].create({"name": "Test partner"})
+        cls.partner = cls.env["res.partner"].create(
+            {
+                "name": "Test partner",
+                "property_account_receivable_id": cls.company_data[
+                    "default_account_receivable"
+                ].id,
+                "property_account_payable_id": cls.company_data[
+                    "default_account_payable"
+                ].id,
+            }
+        )
         default_line_account = cls.env["account.account"].create(
             {
                 "name": "TESTACC",
