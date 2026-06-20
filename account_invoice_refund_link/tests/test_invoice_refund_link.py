@@ -2,7 +2,6 @@
 # Copyright 2014-2023 Tecnativa - Pedro M. Baeza
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import Command, fields
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
@@ -34,30 +33,9 @@ class TestInvoiceRefundLinkBase(AccountTestInvoicingCommon):
                 "property_account_payable_id": cls.payable_account.id,
             }
         )
-        cls.partner = cls.env["res.partner"].create(
-            {
-                "name": "Test partner",
-                "company_id": cls.company.id,
-                "property_account_receivable_id": cls.receivable_account.id,
-                "property_account_payable_id": cls.payable_account.id,
-            }
-        )
-        default_line_account = cls.env["account.account"].create(
-            {
-                "name": "TESTACC",
-                "code": "TESTACC",
-                "account_type": "income",
-                "company_ids": [Command.link(cls.company.id)],
-            }
-        )
-        cls.journal = cls.env["account.journal"].create(
-            {
-                "name": "Journal 1",
-                "code": "J1",
-                "type": "sale",
-                "company_id": cls.company.id,
-            }
-        )
+        cls.partner = cls.partner_a
+        default_line_account = cls.company_data["default_account_revenue"]
+        cls.journal = cls.company_data["default_journal_sale"]
         cls.invoice_lines = [
             (
                 0,
@@ -94,20 +72,8 @@ class TestInvoiceRefundLinkBase(AccountTestInvoicingCommon):
                 "company_id": cls.company.id,
                 "journal_id": cls.journal.id,
                 "move_type": "out_invoice",
+                "invoice_date": "2019-01-01",
                 "invoice_line_ids": cls.invoice_lines,
-                "line_ids": [
-                    Command.create(
-                        {
-                            "account_id": cls.receivable_account.id,
-                            "amount_currency": 150.0,
-                            "balance": 150.0,
-                            "date_maturity": fields.Date.today(),
-                            "debit": 150.0,
-                            "display_type": "payment_term",
-                            "partner_id": cls.partner.id,
-                        },
-                    )
-                ],
             }
         )
         cls.invoice.action_post()
