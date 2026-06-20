@@ -2,7 +2,7 @@
 # Copyright 2014-2023 Tecnativa - Pedro M. Baeza
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import Command
+from odoo import Command, fields
 
 from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
@@ -95,6 +95,19 @@ class TestInvoiceRefundLinkBase(AccountTestInvoicingCommon):
                 "journal_id": cls.journal.id,
                 "move_type": "out_invoice",
                 "invoice_line_ids": cls.invoice_lines,
+                "line_ids": [
+                    Command.create(
+                        {
+                            "account_id": cls.receivable_account.id,
+                            "amount_currency": 150.0,
+                            "balance": 150.0,
+                            "date_maturity": fields.Date.today(),
+                            "debit": 150.0,
+                            "display_type": "payment_term",
+                            "partner_id": cls.partner.id,
+                        },
+                    )
+                ],
             }
         )
         cls.invoice.action_post()
