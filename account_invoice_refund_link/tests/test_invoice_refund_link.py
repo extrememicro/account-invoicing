@@ -35,7 +35,14 @@ class TestInvoiceRefundLinkBase(AccountTestInvoicingCommon):
         )
         cls.partner = cls.partner_a
         default_line_account = cls.company_data["default_account_revenue"]
-        cls.journal = cls.company_data["default_journal_sale"]
+        cls.journal = cls.env["account.journal"].create(
+            {
+                "name": "Journal 1",
+                "code": "J1",
+                "type": "sale",
+                "company_id": cls.company.id,
+            }
+        )
         cls.invoice_lines = [
             (
                 0,
